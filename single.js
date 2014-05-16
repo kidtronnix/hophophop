@@ -39,6 +39,8 @@ var viewport = {
     'viewport': {width: 1440, height: 813}
 };
 
+startTime = new Date().getTime();
+
 // Start casper browser simulation
 casper.start(startingURL, function() {
 
@@ -47,6 +49,7 @@ casper.start(startingURL, function() {
 
 // set current viewport as current array element
 casper.then(function() {
+
     this.userAgent(viewport.userAgent);
     this.viewport(viewport.viewport.width, viewport.viewport.height);
 
