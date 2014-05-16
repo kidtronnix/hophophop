@@ -41,9 +41,14 @@ if (casper.cli.args.length < 1) {
             'viewport': {width: 1440, height: 813}
         },
         {
-            'name': 'Iphone',
-            'userAgent': 'Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_0 like Mac OS X; en-us) AppleWebKit/532.9 (KHTML, like Gecko) Version/4.0.5 Mobile/8A293 Safari/6531.22.7',
-            'viewport': {width: 1440, height: 813}
+            'name': 'Nexus 5',
+            'userAgent': 'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 5 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari/537.36',
+            'viewport': {width: 1080, height: 1920}
+        },
+        {
+            'name': 'Dudbot',
+            'userAgent': 'Mozilla/5.0 (Linux; Android 4.4.2; Nexus 5 Build/KOT49H) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari/537.36',
+            'viewport': {width: 1080, height: 1920}
         }
     ];
 }
@@ -56,11 +61,17 @@ casper.start(startingURL, function() {
 // Go through each viewports
 casper.each(viewports, function(casper, viewport) {
 
+    var view = viewport.name;
 
     // set current viewport as current array element
     this.then(function() {
         this.userAgent(viewport.userAgent);
         this.viewport(viewport.viewport.width, viewport.viewport.height);
+
+        Reports[viewport.name] = {
+            hops: [],
+            resources: []
+        };
     });
 
     // Open and wait 5 seconds
@@ -70,24 +81,39 @@ casper.each(viewports, function(casper, viewport) {
         this.echo('/////////// OPENING BROWSER ')
         this.echo(JSON.stringify(viewport, null, 2));
         this.echo('Waiting 5 seconds for everything to load...', 'info');
+        this.wait(5000);
 
-        // Make viewport
-        var view = viewport.name;
-        Reports[view] = {
-            hops: []
-        };
+//        var view = viewport.name;
+
 
         // Begin timer and wait for any redirects to occur
         startTime = new Date().getTime();
-        this.wait(5000);
 
 
 
-        // let's definte some event processing
+
+
+
+//        // Report back with Report
+//        this.on('http.status.200', function(resource) {
+//            this.echo('Something Landed @ '+ resource.url);
+//        })
+
+        // let's define some event processing
+
+        // Report back with resouces we are receiving
+        this.on('resource.received', function(resource) {
+//            this.echo('Resource @ '+ resource.url);
+
+            Reports[view].resources.push(resource.url);
+        })
+
+
+        // Navigations
         this.on('navigation.requested', function(url, navigationType, navigationLocked, isMainFrame) {
 
             // Woooop hop happened
-            this.echo('Hop! '+view);
+            this.echo('Hop! '+ view);
 
             // Move current -> previous
             previousURL = currentURL;
@@ -97,6 +123,7 @@ casper.each(viewports, function(casper, viewport) {
             var hop = {
                 from: previousURL,
                 to: url,
+                locked: navigationLocked,
                 time: new Date().getTime() - startTime
             }
 
@@ -104,12 +131,10 @@ casper.each(viewports, function(casper, viewport) {
             Reports[view].hops.push(hop);
 //            this.echo(JSON.stringify(Reports[viewport.name], null, 2));
 
+
         });
 
-        // Report back with Report
-        this.on('http.status.200', function(resource) {
-            this.echo('Something Landed @ '+ resource.url);
-        })
+
     });
 
     // Ok we have waited 5 seconds on the page
@@ -117,14 +142,17 @@ casper.each(viewports, function(casper, viewport) {
 
         this.echo('Landed @ ' + this.getCurrentUrl(), 'info');
 
-        this.echo('Screenshot for ' + viewport.name + ' (' + viewport.viewport.width + 'x' + viewport.viewport.height + ')', 'info');
-        this.capture('screenshots/' + viewport.name + '-' + viewport.viewport.width + 'x' + viewport.viewport.height + '.png', {
-            top: 0,
-            left: 0,
-            width: viewport.viewport.width,
-            height: viewport.viewport.height
-        });
+//        this.echo('Screenshot for ' + viewport.name + ' (' + viewport.viewport.width + 'x' + viewport.viewport.height + ')', 'info');
+//        this.capture('screenshots/' + viewport.name + '-' + viewport.viewport.width + 'x' + viewport.viewport.height + '.png', {
+//            top: 0,
+//            left: 0,
+//            width: viewport.viewport.width,
+//            height: viewport.viewport.height
+//        });
     });
+
+
+
 });
 
 // Report back with Report
