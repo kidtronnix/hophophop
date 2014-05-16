@@ -123,7 +123,7 @@ casper.each(viewports, function(casper, viewport) {
             var hop = {
                 from: previousURL,
                 to: url,
-                locked: navigationLocked,
+                isMainFrame: isMainFrame,
                 time: new Date().getTime() - startTime
             }
 
