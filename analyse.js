@@ -70,7 +70,8 @@ casper.each(viewports, function(casper, viewport) {
 
         Reports[viewport.name] = {
             hops: [],
-            resources: []
+            resources: [],
+            flags: []
         };
     });
 
@@ -106,6 +107,13 @@ casper.each(viewports, function(casper, viewport) {
 //            this.echo('Resource @ '+ resource.url);
 
             Reports[view].resources.push(resource.url);
+            res = resource.url.match(/\.apk$/i);
+
+            this.echo(JSON.stringify(res, null, 2));
+
+//            if(res.length > 0) {
+//                Reports[view].flags.push(resource.url);
+//            }
         })
 
 
