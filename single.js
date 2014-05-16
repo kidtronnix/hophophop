@@ -82,16 +82,21 @@ casper.on('navigation.requested', function(url, navigationType, navigationLocked
     previousURL = currentURL;
     currentURL = url;
 
-    // make ind. report
-    var hop = {
-        from: previousURL,
-        to: url,
-        isMainFrame: isMainFrame,
-        time: new Date().getTime() - startTime
-    };
+    // Let's filter out hops that are redirecting to same place
+    if(previousURL != currentURL) {
+        // make ind. report
+        var hop = {
+            from: previousURL,
+            to: url,
+            isMainFrame: isMainFrame,
+            time: new Date().getTime() - startTime
+        };
 
-    // Add it to the reports object
-    Report.hops.push(hop);
+        // Add it to the reports object
+        Report.hops.push(hop);
+    }
+
+
 //            this.echo(JSON.stringify(Reports[viewport.name], null, 2));
 });
 
